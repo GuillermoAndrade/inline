@@ -14,7 +14,7 @@ import tempfile
 __version__ = '0.0.1'
 
 
-def c(source, libraries=[]):
+def c(source, libraries=[], compiler_extra_args=[], link_extra_args=[]):
     r"""
     >>> c('int add(int a, int b) {return a + b;}').add(40, 2)
     42
@@ -26,11 +26,11 @@ def c(source, libraries=[]):
     >>> sqrt(ctypes.c_double(400.0))
     20.0
     """
-    path = _cc_build_shared_lib(source, '.c', libraries)
+    path = _cc_build_shared_lib(source, '.c', libraries, compiler_extra_args, link_extra_args)
     return ctypes.cdll.LoadLibrary(path)
 
 
-def cxx(source, libraries=[], compiler_extra_args=[],link_extra_args):
+def cxx(source, libraries=[], compiler_extra_args=[], link_extra_args=[]):
     r"""
     >>> cxx('extern "C" { int add(int a, int b) {return a + b;} }').add(40, 2)
     42
