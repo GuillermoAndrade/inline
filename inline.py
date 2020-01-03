@@ -26,7 +26,8 @@ def c(source, libraries=[], compiler_extra_args=[], link_extra_args=[]):
     >>> sqrt(ctypes.c_double(400.0))
     20.0
     """
-    path = _cc_build_shared_lib(source, '.c', libraries, compiler_extra_args, link_extra_args)
+    path = _cc_build_shared_lib(source, '.c', libraries, 
+        compiler_extra_args, link_extra_args)
     return ctypes.cdll.LoadLibrary(path)
 
 
@@ -35,7 +36,8 @@ def cxx(source, libraries=[], compiler_extra_args=[], link_extra_args=[]):
     >>> cxx('extern "C" { int add(int a, int b) {return a + b;} }').add(40, 2)
     42
     """
-    path = _cc_build_shared_lib(source, '.cc', libraries, compiler_extra_args, link_extra_args)
+    path = _cc_build_shared_lib(source, '.cc', libraries,
+        compiler_extra_args, link_extra_args)
     return ctypes.cdll.LoadLibrary(path)
 
 cpp = cxx  # alias
@@ -51,7 +53,8 @@ def python(source):
     return obj
 
 
-def _cc_build_shared_lib(source, suffix, libraries, compiler_extra_args, link_extra_args):
+def _cc_build_shared_lib(source, suffix, libraries, 
+    compiler_extra_args, link_extra_args):
     tempdir = tempfile.mkdtemp()
     atexit.register(lambda: shutil.rmtree(tempdir))
     cc = distutils.ccompiler.new_compiler()
