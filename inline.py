@@ -30,12 +30,12 @@ def c(source, libraries=[]):
     return ctypes.cdll.LoadLibrary(path)
 
 
-def cxx(source, libraries=[]):
+def cxx(source, libraries=[], compiler_extra_args=[],link_extra_args):
     r"""
     >>> cxx('extern "C" { int add(int a, int b) {return a + b;} }').add(40, 2)
     42
     """
-    path = _cc_build_shared_lib(source, '.cc', libraries)
+    path = _cc_build_shared_lib(source, '.cc', libraries, compiler_extra_args, link_extra_args)
     return ctypes.cdll.LoadLibrary(path)
 
 cpp = cxx  # alias
@@ -51,20 +51,20 @@ def python(source):
     return obj
 
 
-def _cc_build_shared_lib(source, suffix, libraries):
+def _cc_build_shared_lib(source, suffix, libraries, compiler_extra_args, link_extra_args):
     tempdir = tempfile.mkdtemp()
     atexit.register(lambda: shutil.rmtree(tempdir))
     cc = distutils.ccompiler.new_compiler()
     with tempfile.NamedTemporaryFile('w+', suffix=suffix, dir=tempdir) as f:
         f.write(source)
         f.seek(0)
-        args = []
+        args = [] + compiler_extra_args
         if platform.system() == 'Linux':
             args.append('-fPIC')
         objs = cc.compile((f.name,), tempdir, extra_postargs=args)
     for library in libraries:
         cc.add_library(library)
-    cc.link_shared_lib(objs, f.name, tempdir)
+    cc.link_shared_lib(objs, f.name, tempdir, extra_postargs=link_extra_args)
     filename = cc.library_filename(f.name, 'shared')
     return os.path.join(tempdir, filename)
 
